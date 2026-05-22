@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ingresar · SyncBook</title>
+  <link rel="stylesheet" href="shared.css">
+  <link rel="stylesheet" href="login.css">
+</head>
+<body>
+<div class="auth-wrap">
+  <!-- Panel izquierdo -->
+  <div class="auth-left">
+    <div class="auth-left-blob1"></div><div class="auth-left-blob2"></div>
+    <a href="index.html" class="auth-brand"><div class="brand-icon">✦</div>SyncBook</a>
+    <div class="auth-left-body">
+      <h2 class="auth-left-title">La plataforma que conecta barberías con sus clientes.</h2>
+      <p class="auth-left-sub">Registrá tu barbería, configurá tus servicios y precios, y empezá a recibir reservas online hoy mismo.</p>
+      <div class="auth-feats">
+        <div class="auth-feat"><div class="auth-feat-ico">📅</div><span>Reservas online 24/7</span></div>
+        <div class="auth-feat"><div class="auth-feat-ico">⚙️</div><span>Configurá tus servicios y precios</span></div>
+        <div id="feat-admin" class="auth-feat"><div class="auth-feat-ico">📊</div><span>Panel de administración completo</span></div>
+        <div class="auth-feat"><div class="auth-feat-ico">🆓</div><span>Empezá gratis, sin tarjeta</span></div>
+      </div>
+    </div>
+    <div class="auth-left-footer">© 2025 SyncBook · Proyecto de Graduación</div>
+  </div>
+
+  <!-- Panel derecho -->
+  <div class="auth-right">
+    <div class="auth-right-inner">
+      <div class="auth-logo-mobile"><a href="index.html" style="display:flex;align-items:center;gap:.5rem;font-size:1.3rem;font-weight:800;color:var(--purple)"><div class="brand-icon" style="width:28px;height:28px;font-size:.8rem">✦</div>SyncBook</a></div>
+
+      <div class="auth-header">
+        <h2 id="auth-title">Bienvenido de vuelta 👋</h2>
+        <p id="auth-subtitle">Ingresá a tu cuenta para continuar.</p>
+      </div>
+
+      <!-- Tabs -->
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tab-login" onclick="cambiarTab('login')">Ingresar</button>
+        <button class="auth-tab" id="tab-registro" onclick="cambiarTab('registro')">Registrarse</button>
+      </div>
+
+      <!-- ── PANEL LOGIN ── -->
+      <div id="panel-login">
+        <form id="form-login" novalidate style="display:flex;flex-direction:column;gap:1rem">
+          <div class="form-group">
+            <label for="l-email">Email</label>
+            <input id="l-email" type="email" placeholder="tu@email.com" autocomplete="email" required>
+            <span class="field-error" id="err-l-email"></span>
+          </div>
+          <div class="form-group">
+            <label for="l-pass">Contraseña</label>
+            <div class="pass-wrap">
+              <input id="l-pass" type="password" placeholder="Tu contraseña" autocomplete="current-password" required>
+              <button type="button" class="pass-eye" data-target="l-pass">👁</button>
+            </div>
+            <span class="field-error" id="err-l-pass"></span>
+          </div>
+          <button type="submit" class="btn btn-purple btn-full" id="btn-login">
+            <span class="btn-text">Ingresar →</span>
+            <span class="btn-loader hidden"><span class="spinner"></span> Verificando...</span>
+          </button>
+        </form>
+        <div id="msg-login" class="auth-msg" style="display:none"></div>
+        <p class="auth-hint">¿No tenés cuenta? <button class="link-btn" onclick="cambiarTab('registro')">Registrate gratis</button></p>
+      </div>
+
+      <!-- ── PANEL REGISTRO ── -->
+      <div id="panel-registro" class="hidden">
+        <!-- Selector de tipo de cuenta -->
+        <div class="tipo-cuenta">
+          <p class="tipo-label">¿Cómo vas a usar SyncBook?</p>
+          <div class="tipo-grid">
+            <button type="button" class="tipo-btn active" data-tipo="cliente" id="tipo-cliente">
+              <span class="tipo-ico">👤</span>
+              <span class="tipo-nombre">Cliente</span>
+              <span class="tipo-desc">Quiero reservar turnos</span>
+            </button>
+            <button type="button" class="tipo-btn" data-tipo="dueno" id="tipo-dueno">
+              <span class="tipo-ico">💈</span>
+              <span class="tipo-nombre">Soy barbero</span>
+              <span class="tipo-desc">Quiero registrar mi negocio</span>
+            </button>
+          </div>
+        </div>
+
+        <form id="form-registro" novalidate style="display:flex;flex-direction:column;gap:1rem">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="r-nombre">Nombre</label>
+              <input id="r-nombre" type="text" placeholder="Tu nombre" required data-tipo="letras">
+              <span class="field-error" id="err-r-nombre"></span>
+            </div>
+            <div class="form-group">
+              <label for="r-apellido">Apellido</label>
+              <input id="r-apellido" type="text" placeholder="Tu apellido" data-tipo="letras">
+              <span class="field-error" id="err-r-apellido"></span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="r-email">Email</label>
+            <input id="r-email" type="email" placeholder="tu@email.com" autocomplete="email" required>
+            <span class="field-error" id="err-r-email"></span>
+          </div>
+          <div class="form-group">
+            <label for="r-tel">Teléfono <span style="color:var(--gray-400);font-weight:400">(opcional)</span></label>
+            <input id="r-tel" type="tel" placeholder="+54 9 11 0000-0000" data-tipo="telefono">
+            <span class="field-error" id="err-r-tel"></span>
+          </div>
+          <div class="form-group">
+            <label for="r-pass">Contraseña</label>
+            <div class="pass-wrap">
+              <input id="r-pass" type="password" placeholder="Mínimo 6 caracteres" autocomplete="new-password" required>
+              <button type="button" class="pass-eye" data-target="r-pass">👁</button>
+            </div>
+            <span class="field-error" id="err-r-pass"></span>
+          </div>
+
+          <div id="tipo-badge" class="tipo-badge tipo-cliente">
+            <span id="tipo-badge-ico">👤</span>
+            <span>Registrándote como <strong id="tipo-badge-txt">Cliente</strong></span>
+          </div>
+
+          <button type="submit" class="btn btn-purple btn-full" id="btn-registro">
+            <span class="btn-text">Crear cuenta →</span>
+            <span class="btn-loader hidden"><span class="spinner"></span> Creando...</span>
+          </button>
+        </form>
+        <div id="msg-registro" class="auth-msg" style="display:none"></div>
+        <p class="auth-hint">¿Ya tenés cuenta? <button class="link-btn" onclick="cambiarTab('login')">Ingresá aquí</button></p>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
+<script src="login.js"></script>
+</body>
+</html>

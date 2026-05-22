@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Confirmación · SyncBook</title>
+  <link rel="stylesheet" href="shared.css">
+  <link rel="stylesheet" href="confirmacion.css">
+</head>
+<body>
+  <nav class="navbar" id="navbar">
+    <a href="index.html" class="navbar-brand"><div class="brand-icon">✦</div>SyncBook</a>
+    <button class="navbar-toggle" id="nav-toggle">☰</button>
+    <ul class="navbar-links" id="nav-links">
+      <li><a href="index.html">← Todas las barberías</a></li>
+    </ul>
+    <div class="navbar-actions" id="nav-actions">
+      <a href="index.html"><button class="btn-nav-purple">Nueva reserva</button></a>
+    </div>
+  </nav>
+  <div class="conf-page">
+    <div class="conf-hero">
+      <div class="conf-hero-bg"></div>
+      <div class="check-wrap">
+        <svg viewBox="0 0 52 52" width="80" height="80">
+          <circle class="chk-circle" cx="26" cy="26" r="24" fill="none" stroke-width="2.5"/>
+          <path class="chk-mark" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" d="M14 27l8 8 16-16"/>
+        </svg>
+      </div>
+      <h1>¡Turno registrado!</h1>
+      <p>Tu reserva fue guardada. El barbero la confirmará a la brevedad.</p>
+    </div>
+    <div id="ticket-wrap">
+      <div class="ticket">
+        <div class="ticket-top">
+          <span class="ticket-logo">✦ SyncBook</span>
+          <span class="ticket-estado">Pendiente de confirmación</span>
+        </div>
+        <div class="ticket-body">
+          <div class="ticket-row"><span class="tl">Negocio</span><span class="tv" id="c-negocio">—</span></div>
+          <div class="ticket-row"><span class="tl">Servicio</span><span class="tv" id="c-servicio">—</span></div>
+          <div class="ticket-row"><span class="tl">Duración</span><span class="tv" id="c-duracion">—</span></div>
+          <div class="ticket-row"><span class="tl">Precio</span><span class="tv tv-precio" id="c-precio">—</span></div>
+          <div class="ticket-div"></div>
+          <div class="ticket-row"><span class="tl">Cliente</span><span class="tv" id="c-nombre">—</span></div>
+          <div class="ticket-row"><span class="tl">Teléfono</span><span class="tv" id="c-tel">—</span></div>
+          <div class="ticket-div"></div>
+          <div class="ticket-row ticket-hl"><span class="tl">Fecha</span><span class="tv" id="c-fecha">—</span></div>
+          <div class="ticket-row ticket-hl"><span class="tl">Horario</span><span class="tv" id="c-hora">—</span></div>
+          <div class="ticket-row" id="c-notas-row" style="display:none"><span class="tl">Notas</span><span class="tv" id="c-notas">—</span></div>
+        </div>
+        <div class="ticket-bottom">
+          <div class="barcode" id="barcode"></div>
+          <p class="ticket-aviso">Guardá este comprobante. El negocio confirmará tu turno a la brevedad.</p>
+        </div>
+      </div>
+      <div class="conf-actions">
+        <button class="btn btn-purple" onclick="window.print()">🖨️ Imprimir</button>
+        <a href="mis-citas.html" class="btn btn-white">Ver mis citas</a>
+        <a href="index.html" class="btn btn-white">Ver más barberías</a>
+      </div>
+    </div>
+    <div id="sin-datos" class="hidden" style="text-align:center;padding:4rem 1rem">
+      <div style="font-size:3rem;margin-bottom:1rem">📋</div>
+      <h3 style="font-size:1.4rem;font-weight:800;color:var(--gray-900);margin-bottom:.5rem">Sin reserva reciente</h3>
+      <p style="color:var(--gray-500);margin-bottom:1.5rem">Llegaste aquí directamente. Hacé una reserva primero.</p>
+      <a href="index.html" class="btn btn-purple">Ver barberías →</a>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase.js"></script>
+  <script src="confirmacion.js"></script>
+</body>
+</html>

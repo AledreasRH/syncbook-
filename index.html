@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SyncBook — Reserva tu turno en la mejor barbería</title>
+  <link rel="stylesheet" href="shared.css">
+  <link rel="stylesheet" href="index.css">
+</head>
+<body>
+  <nav class="navbar" id="navbar">
+    <a href="index.html" class="navbar-brand"><div class="brand-icon">✦</div>SyncBook</a>
+    <button class="navbar-toggle" id="nav-toggle">☰</button>
+    <ul class="navbar-links" id="nav-links">
+      <li><a href="index.html" class="active">Inicio</a></li>
+      <li><a href="#negocios">Barberías</a></li>
+      <li><a href="#como-funciona">Cómo funciona</a></li>
+    </ul>
+    <div class="navbar-actions" id="nav-actions">
+      <a href="login.html"><button class="btn-nav-ghost">Ingresar</button></a>
+      <a href="registro-negocio.html"><button class="btn-nav-purple">Registrar mi barbería →</button></a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-bg"><div class="blob1"></div><div class="blob2"></div><div class="grid-bg"></div></div>
+    <div class="container">
+      <div class="hero-inner">
+        <div class="hero-left">
+          <div class="hero-badge"><span class="pulse-dot"></span>Plataforma para barberías</div>
+          <h1 class="hero-title">Reservá tu turno<br>en la <span>barbería ideal</span></h1>
+          <p class="hero-sub">Encontrá la barbería perfecta, elegí el servicio y reservá tu cita en segundos. Sin llamadas, sin esperas.</p>
+          <div class="hero-search">
+            <div class="search-box">
+              <span class="search-icon">🔍</span>
+              <input type="text" id="hero-buscar" placeholder="Buscá una barbería...">
+              <button class="btn btn-purple" onclick="document.getElementById('negocios').scrollIntoView({behavior:'smooth'})">Buscar</button>
+            </div>
+          </div>
+          <div class="hero-stats">
+            <div class="hstat"><strong>+500</strong><span>Barberías</span></div>
+            <div class="hstat-div"></div>
+            <div class="hstat"><strong>+12k</strong><span>Reservas</span></div>
+            <div class="hstat-div"></div>
+            <div class="hstat"><strong>4.9★</strong><span>Valoración</span></div>
+          </div>
+        </div>
+        <div class="hero-right">
+          <div class="hero-card">
+            <div class="hero-card-top"><div class="dots"><span></span><span></span><span></span></div><span>SyncBook</span></div>
+            <div class="hero-card-body">
+              <div class="hc-negocio"><div class="hc-neg-icon">💈</div><div><div class="hc-neg-name">Barber Studio</div><div class="hc-neg-loc">📍 Buenos Aires</div></div><span class="badge badge-green">Disponible</span></div>
+              <div class="hc-servicios">
+                <div class="hc-serv"><span>Corte + Barba</span><span class="hc-price">$2.500</span></div>
+                <div class="hc-serv"><span>Corte clásico</span><span class="hc-price">$1.500</span></div>
+                <div class="hc-serv"><span>Afeitado</span><span class="hc-price">$1.800</span></div>
+              </div>
+              <button class="btn btn-purple btn-full" style="margin-top:.75rem">Reservar ahora →</button>
+            </div>
+          </div>
+          <div class="float-notif float-1"><span>✅</span><div><div>¡Turno confirmado!</div><div style="font-size:.75rem;color:var(--gray-500)">Hoy 15:30 · Juan P.</div></div></div>
+          <div class="float-notif float-2"><span>📅</span><div><div>Nueva reserva</div><div style="font-size:.75rem;color:var(--gray-500)">Mañana 10:00</div></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CATÁLOGO DE BARBERÍAS -->
+  <section class="section" id="negocios">
+    <div class="container">
+      <div class="section-center">
+        <div class="section-badge">✦ Barberías disponibles</div>
+        <h2 class="section-title">Encontrá tu barbería</h2>
+        <p class="section-sub">Todas las barberías registradas en SyncBook. Elegí la que más te guste y reservá al instante.</p>
+      </div>
+      <div class="negocios-filters">
+        <input type="text" id="filtro-negocio" placeholder="🔍 Buscar barbería o ciudad..." class="negocio-search">
+      </div>
+      <div id="lista-negocios" class="negocios-grid">
+        <div class="neg-sk"></div><div class="neg-sk"></div><div class="neg-sk"></div>
+      </div>
+      <div id="negocios-vacio" class="negocios-vacio hidden">
+        <div style="font-size:3rem;margin-bottom:1rem">🔍</div>
+        <h3>No encontramos barberías</h3>
+        <p>Probá con otro término de búsqueda.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CÓMO FUNCIONA -->
+  <section class="section how-section" id="como-funciona" style="background:var(--gray-50)">
+    <div class="container">
+      <div class="how-grid">
+        <div>
+          <div class="section-badge">✦ Cómo funciona</div>
+          <h2 class="section-title">Reservar es <span>muy simple</span></h2>
+          <p class="section-sub">En 3 pasos tenés tu turno confirmado.</p>
+          <div class="steps">
+            <div class="step"><div class="step-n">1</div><div><h4>Elegí la barbería</h4><p>Navegá el catálogo y elegí la barbería que más te guste.</p></div></div>
+            <div class="step"><div class="step-n">2</div><div><h4>Seleccioná el servicio</h4><p>Cada barbería tiene sus propios servicios y precios.</p></div></div>
+            <div class="step"><div class="step-n">3</div><div><h4>Confirmá tu turno</h4><p>Ingresá tus datos y listo. El barbero lo confirma en minutos.</p></div></div>
+          </div>
+        </div>
+        <div class="how-for-barbers">
+          <div class="section-badge">✦ ¿Sos barbero?</div>
+          <h2 class="section-title">Digitalizá tu <span>negocio</span></h2>
+          <p class="section-sub">Registrá tu barbería, configurá tus servicios con tus precios y empezá a recibir reservas online.</p>
+          <ul class="barber-features">
+            <li><span>📅</span> Agenda online 24/7</li>
+            <li><span>⚙️</span> Configurá tus propios servicios y precios</li>
+            <li><span>📊</span> Panel de administración completo</li>
+            <li><span>📱</span> Funciona desde cualquier dispositivo</li>
+            <li><span>🆓</span> Empezá gratis, sin tarjeta de crédito</li>
+          </ul>
+          <a href="registro-negocio.html" class="btn btn-purple btn-lg" style="margin-top:1.5rem">Registrar mi barbería →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <div class="container">
+      <div class="cta-inner">
+        <h2>¿Tenés una barbería?</h2>
+        <p>Sumala a SyncBook y empezá a recibir reservas online hoy mismo. Gratis.</p>
+        <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-top:2rem">
+          <a href="registro-negocio.html" class="btn btn-white btn-xl">Registrar mi barbería →</a>
+          <a href="login.html" class="btn btn-xl" style="background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.3)">Ya tengo cuenta</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div><div class="footer-brand">✦ SyncBook</div><p class="footer-tagline">Plataforma web para la gestión y reserva de turnos en barberías. Proyecto de Graduación · Soporte Informático.</p></div>
+      <div class="footer-col"><h4>Plataforma</h4><ul><li><a href="index.html">Inicio</a></li><li><a href="#negocios">Barberías</a></li><li><a href="registro-negocio.html">Registrar negocio</a></li></ul></div>
+      <div class="footer-col"><h4>Cuenta</h4><ul><li><a href="login.html">Ingresar</a></li><li><a href="mis-citas.html">Mis citas</a></li></ul></div>
+      <div class="footer-col"><h4>Info</h4><ul><li><a href="contacto.html">Contacto</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><span>© 2025 SyncBook · Proyecto de Graduación</span><span>Powered by <span class="footer-purple">Supabase</span></span></div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase.js"></script>
+  <script src="index.js"></script>
+</body>
+</html>

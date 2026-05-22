@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Barbería · SyncBook</title>
+  <link rel="stylesheet" href="shared.css">
+  <link rel="stylesheet" href="barberia.css">
+  
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+<body>
+  <nav class="navbar" id="navbar">
+    <a href="index.html" class="navbar-brand"><div class="brand-icon">✦</div>SyncBook</a>
+    <button class="navbar-toggle" id="nav-toggle">☰</button>
+    <ul class="navbar-links" id="nav-links">
+      <li><a href="index.html">← Todas las barberías</a></li>
+    </ul>
+    <div class="navbar-actions" id="nav-actions">
+      <a href="login.html"><button class="btn-nav-ghost btn-ingresar">Ingresar</button></a>
+    </div>
+  </nav>
+
+  <div id="vista-loading" style="min-height:60vh;display:flex;align-items:center;justify-content:center">
+    <div style="text-align:center"><span class="spinner spinner-dark" style="width:32px;height:32px;border-width:3px;margin:0 auto"></span><p style="margin-top:1rem;color:var(--gray-500)">Cargando barbería...</p></div>
+  </div>
+
+  <div id="vista-404" class="hidden" style="min-height:60vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2rem">
+    <div style="font-size:3rem;margin-bottom:1rem">❌</div>
+    <h2 style="font-size:1.5rem;font-weight:800;color:var(--gray-900);margin-bottom:.5rem">Barbería no encontrada</h2>
+    <p style="color:var(--gray-500);margin-bottom:1.5rem">El link que seguiste no es válido o la barbería fue desactivada.</p>
+    <a href="index.html" class="btn btn-purple">Ver todas las barberías</a>
+  </div>
+
+  <div id="vista-barberia" class="hidden">
+
+    <div class="barb-hero">
+      <div class="barb-hero-cover" id="barb-cover">💈</div>
+      <div class="container">
+        <div class="barb-hero-info">
+          <div class="barb-logo" id="barb-logo">💈</div>
+          <div class="barb-info-text">
+            <h1 id="barb-nombre">—</h1>
+            <div class="barb-meta">
+              <span id="barb-ciudad">—</span>
+              <span class="barb-sep">·</span>
+              <span id="barb-horario">—</span>
+            </div>
+            <p id="barb-desc" class="barb-desc"></p>
+          </div>
+          <div class="barb-contact">
+            <a id="barb-tel-link" href="#" class="btn btn-white btn-sm" style="display:none">📞 Llamar</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container barb-content">
+      <div class="barb-layout">
+
+        <main class="barb-main">
+          <h2 class="barb-section-title">Servicios disponibles</h2>
+          <p class="barb-section-sub">Elegí el servicio que querés y reservá tu turno al instante.</p>
+          <div id="barb-servicios" class="barb-servicios-grid">
+            <div class="serv-sk"></div><div class="serv-sk"></div><div class="serv-sk"></div>
+          </div>
+          
+          <div style="margin-top: 3rem; border-top: 1px solid var(--gray-200); padding-top: 2rem;">
+            <h2 class="barb-section-title">Ubicación</h2>
+            <p class="barb-section-sub" id="barb-direccion-texto">Localización de la barbería.</p>
+            <div id="mapa-cliente" style="height: 300px; border-radius: var(--radius-xl); background: #eee; border: 1px solid var(--gray-200); z-index: 1; display: none;"></div>
+          </div>
+        </main>
+
+        <aside class="barb-aside" id="barb-aside">
+          <div id="aside-empty" class="aside-empty">
+            <div style="font-size:2.5rem;margin-bottom:.75rem">👆</div>
+            <h3>Elegí un servicio</h3>
+            <p>Seleccioná el servicio que querés para continuar con la reserva.</p>
+          </div>
+          <div id="aside-form" class="hidden">
+            <div class="aside-serv-resumen">
+              <div class="aside-serv-badge">Servicio elegido</div>
+              <h3 id="aside-serv-nombre">—</h3>
+              <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.5rem">
+                <span class="badge badge-purple" id="aside-serv-dur">—</span>
+                <span class="badge badge-gray aside-serv-precio" id="aside-serv-precio">—</span>
+              </div>
+              <button class="btn-cambiar-serv" id="btn-cambiar-serv">Cambiar servicio</button>
+            </div>
+            <form id="form-reserva" novalidate style="display:flex;flex-direction:column;gap:1rem;margin-top:1.25rem">
+              <div id="sesion-badge" class="sesion-badge hidden"></div>
+              <div class="form-group">
+                <label for="cl-nombre">Nombre completo</label>
+                <input id="cl-nombre" type="text" placeholder="Tu nombre" required data-tipo="letras">
+                <span class="field-error" id="err-cl-nombre"></span>
+              </div>
+              <div class="form-group">
+                <label for="cl-tel">Teléfono</label>
+                <input id="cl-tel" type="tel" placeholder="+54 9 11 0000-0000" required data-tipo="telefono">
+                <span class="field-error" id="err-cl-tel"></span>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="cl-fecha">Fecha</label>
+                  <input id="cl-fecha" type="date" required>
+                  <span class="field-error" id="err-cl-fecha"></span>
+                </div>
+                <div class="form-group">
+                  <label for="cl-hora">Hora</label>
+                  <input id="cl-hora" type="time" min="08:00" max="20:00" required>
+                  <span class="field-error" id="err-cl-hora"></span>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="cl-notas">Notas <span style="color:var(--gray-400);font-weight:400">(opcional)</span></label>
+                <textarea id="cl-notas" rows="2" placeholder="Algún detalle..."></textarea>
+              </div>
+              <button type="submit" class="btn btn-purple btn-full" id="btn-reservar" style="min-height:48px">
+                <span class="btn-text">Confirmar reserva →</span>
+                <span class="btn-loader hidden"><span class="spinner"></span> Guardando...</span>
+              </button>
+            </form>
+            <div id="msg-reserva" class="reserva-msg" role="alert"></div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-exito" class="modal-overlay hidden">
+    <div class="modal-box" style="text-align:center;padding:2.5rem">
+      <div class="modal-check-icon">✓</div>
+      <h3 style="font-size:1.4rem;font-weight:800;color:var(--gray-900);margin:.75rem 0">¡Turno registrado!</h3>
+      <p id="modal-detalle" style="color:var(--gray-600);font-size:.93rem;line-height:1.6;margin-bottom:1.75rem"></p>
+      <div style="display:flex;flex-direction:column;gap:.75rem">
+        <a href="confirmacion.html" class="btn btn-purple">Ver comprobante →</a>
+        <a id="modal-mis-citas" href="mis-citas.html" class="btn btn-white" style="display:none">Ver mis citas</a>
+        <button id="btn-otra" class="btn btn-white" type="button">Hacer otra reserva</button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer" style="margin-top:0">
+    <div class="footer-inner">
+      <div><div class="footer-brand">✦ SyncBook</div><p class="footer-tagline">Plataforma para la gestión y reserva de turnos en barberías.</p></div>
+      <div class="footer-col"><h4>Plataforma</h4><ul><li><a href="index.html">Todas las barberías</a></li><li><a href="registro-negocio.html">Registrar negocio</a></li></ul></div>
+      <div class="footer-col"><h4>Cuenta</h4><ul><li><a href="login.html">Ingresar</a></li><li><a href="mis-citas.html">Mis citas</a></li></ul></div>
+      <div class="footer-col"><h4>Info</h4><ul><li><a href="contacto.html">Contacto</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><span>© 2026 SyncBook</span><span>Powered by <span class="footer-purple">Supabase</span></span></div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase.js"></script>
+  <script src="barberia.js"></script>
+</body>
+</html>

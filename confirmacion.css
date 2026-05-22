@@ -1,0 +1,32 @@
+/* SyncBook · confirmacion.css */
+body{background:var(--gray-50)}
+.conf-page{max-width:660px;margin:0 auto;padding:2.5rem 1.5rem 4rem}
+.conf-hero{text-align:center;padding:3rem 1rem 2.5rem;position:relative}
+.conf-hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 60% 60% at 50% 0%,rgba(127,86,217,.08) 0%,transparent 70%);pointer-events:none}
+.check-wrap{margin:0 auto 1.5rem;position:relative;z-index:1}
+.chk-circle{stroke:var(--purple);stroke-dasharray:160;stroke-dashoffset:160;animation:drawC .6s ease forwards .2s}
+.chk-mark{stroke:var(--purple);stroke-dasharray:50;stroke-dashoffset:50;animation:drawM .4s ease forwards .9s}
+@keyframes drawC{to{stroke-dashoffset:0}}
+@keyframes drawM{to{stroke-dashoffset:0}}
+.conf-hero h1{font-size:clamp(1.8rem,4vw,2.4rem);font-weight:900;color:var(--gray-900);margin-bottom:.5rem;letter-spacing:-.03em;position:relative;z-index:1}
+.conf-hero p{color:var(--gray-500);position:relative;z-index:1}
+.ticket{background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius-xl);box-shadow:var(--shadow-lg);overflow:hidden;animation:fadeUp .5s ease .3s both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.ticket-top{background:var(--gray-900);padding:1.1rem 1.75rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem}
+.ticket-logo{font-size:1rem;font-weight:800;color:var(--purple-light)}
+.ticket-estado{background:rgba(127,86,217,.25);color:var(--purple-light);font-size:.72rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:.3rem .85rem;border-radius:var(--radius-full)}
+.ticket-body{padding:1.5rem 1.75rem}
+.ticket-row{display:flex;justify-content:space-between;align-items:center;padding:.6rem 0;border-bottom:1px dashed var(--gray-200);gap:1rem}
+.ticket-row:last-child{border-bottom:none}
+.ticket-hl{background:var(--purple-pale);margin:0 -1.75rem;padding:.6rem 1.75rem}
+.tl{font-size:.75rem;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:.07em;flex-shrink:0}
+.tv{font-size:.93rem;font-weight:700;color:var(--gray-900);text-align:right}
+.tv-precio{font-size:1.15rem;font-weight:900;color:var(--purple)}
+.ticket-div{height:1px;background:var(--gray-200);margin:.4rem 0}
+.ticket-bottom{background:var(--gray-50);border-top:1px dashed var(--gray-200);padding:1.25rem 1.75rem;display:flex;flex-direction:column;align-items:center;gap:.75rem}
+.barcode{display:flex;gap:2px;height:38px;align-items:flex-end}
+.barcode-bar{background:var(--gray-800);border-radius:1px;width:2px;opacity:.6}
+.ticket-aviso{font-size:.8rem;color:var(--gray-400);text-align:center;max-width:360px;line-height:1.5}
+.conf-actions{display:flex;gap:.75rem;flex-wrap:wrap;justify-content:center;margin-top:1.5rem}
+@media print{.navbar,.conf-actions{display:none!important}.ticket{box-shadow:none;border:1px solid #ccc}body{background:#fff}}
+@media(max-width:520px){.ticket-top{flex-direction:column;align-items:flex-start}.conf-actions{flex-direction:column}.conf-actions .btn{width:100%;justify-content:center}}

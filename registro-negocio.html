@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registrar Barbería · SyncBook</title>
+  <link rel="stylesheet" href="shared.css">
+  
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  
+  <style>
+    body { background: var(--gray-50); }
+    .registro-container { max-width: 600px; margin: 3rem auto; padding: 2rem; background: #fff; border: 1px solid var(--gray-200); border-radius: var(--radius-xl); box-shadow: var(--shadow-sm); }
+  </style>
+</head>
+<body>
+  <nav class="navbar" id="navbar">
+    <a href="index.html" class="navbar-brand"><div class="brand-icon">✦</div>SyncBook</a>
+    <div class="navbar-actions" id="nav-actions">
+      <a href="index.html"><button class="btn-nav-ghost">Volver al inicio</button></a>
+    </div>
+  </nav>
+
+  <div class="registro-container">
+    <h2 style="font-size: 1.5rem; font-weight: 800; color: var(--gray-900); margin-bottom: 0.5rem;">Registrar tu Barbería</h2>
+    <p style="color: var(--gray-500); margin-bottom: 1.5rem;">Completá los datos básicos para empezar a recibir reservas.</p>
+    
+    <form id="form-registro" novalidate style="display:flex;flex-direction:column;gap:1.1rem">
+      <div class="form-group"><label>Nombre del negocio *</label><input id="reg-nombre" type="text" data-tipo="letras" required></div>
+      <div class="form-group"><label>Descripción</label><textarea id="reg-desc" rows="3"></textarea></div>
+      <div class="form-row">
+        <div class="form-group"><label>Ciudad</label><input id="reg-ciudad" type="text" data-tipo="letras"></div>
+        <div class="form-group"><label>Teléfono</label><input id="reg-tel" type="tel" data-tipo="numeros"></div>
+      </div>
+      <div class="form-group"><label>Dirección</label><input id="reg-dir" type="text"></div>
+      
+      <div class="form-group" style="margin-top: .5rem;">
+        <label style="display: flex; justify-content: space-between; align-items: center;">
+          Ubicación exacta
+          <button type="button" id="btn-ubicacion" class="btn btn-white btn-sm" style="padding: 0.2rem 0.5rem; font-size: 0.75rem;">📍 Usar mi ubicación actual</button>
+        </label>
+        <div id="mapa-registro" style="height: 250px; border-radius: var(--radius-md); background: #eee; border: 1px solid var(--gray-300); z-index: 1;"></div>
+        <p style="font-size: 0.8rem; color: var(--gray-500); margin-top: 0.5rem;">Arrastra el marcador o usa el botón para fijar la ubicación de tu barbería.</p>
+        <input type="hidden" id="reg-lat">
+        <input type="hidden" id="reg-lng">
+      </div>
+
+      <div class="form-row">
+        <div class="form-group"><label>Horario apertura</label><input id="reg-h1" type="time" value="09:00"></div>
+        <div class="form-group"><label>Horario cierre</label><input id="reg-h2" type="time" value="20:00"></div>
+      </div>
+      
+      <button type="submit" class="btn btn-purple btn-full" id="btn-registrar">
+        <span class="btn-text">Crear barbería →</span>
+        <span class="btn-loader hidden"><span class="spinner"></span> Procesando...</span>
+      </button>
+      <div id="msg-registro" class="auth-msg" style="display:none; margin-top:.75rem"></div>
+    </form>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase.js"></script>
+  <script src="registro-negocio.js"></script>
+</body>
+</html>
