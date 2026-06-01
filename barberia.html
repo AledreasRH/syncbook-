@@ -5,6 +5,9 @@
   <title>Barbería · SyncBook</title>
   <link rel="stylesheet" href="shared.css">
   <link rel="stylesheet" href="barberia.css">
+  
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
 <body>
   <nav class="navbar" id="navbar">
@@ -18,12 +21,10 @@
     </div>
   </nav>
 
-  <!-- Loading -->
   <div id="vista-loading" style="min-height:60vh;display:flex;align-items:center;justify-content:center">
     <div style="text-align:center"><span class="spinner spinner-dark" style="width:32px;height:32px;border-width:3px;margin:0 auto"></span><p style="margin-top:1rem;color:var(--gray-500)">Cargando barbería...</p></div>
   </div>
 
-  <!-- Not found -->
   <div id="vista-404" class="hidden" style="min-height:60vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2rem">
     <div style="font-size:3rem;margin-bottom:1rem">❌</div>
     <h2 style="font-size:1.5rem;font-weight:800;color:var(--gray-900);margin-bottom:.5rem">Barbería no encontrada</h2>
@@ -31,10 +32,8 @@
     <a href="index.html" class="btn btn-purple">Ver todas las barberías</a>
   </div>
 
-  <!-- Vista principal -->
   <div id="vista-barberia" class="hidden">
 
-    <!-- Hero del negocio -->
     <div class="barb-hero">
       <div class="barb-hero-cover" id="barb-cover">💈</div>
       <div class="container">
@@ -56,7 +55,6 @@
       </div>
     </div>
 
-    <!-- Contenido -->
     <div class="container barb-content">
       <div class="barb-layout">
 
@@ -67,19 +65,13 @@
             <div class="serv-sk"></div><div class="serv-sk"></div><div class="serv-sk"></div>
           </div>
           
-          <!-- UBICACIÓN: MAPA DE GOOGLE -->
-          <div id="contenedor-mapa" class="hidden" style="margin-top: 3rem; border-top: 1px solid var(--gray-200); padding-top: 2rem;">
+          <div style="margin-top: 3rem; border-top: 1px solid var(--gray-200); padding-top: 2rem;">
             <h2 class="barb-section-title">Ubicación</h2>
-            <p class="barb-section-sub" id="mapa-texto-direccion">Cargando dirección...</p>
-            
-            <div style="width: 100%; height: 320px; border-radius: var(--radius-xl); overflow: hidden; border: 1px solid var(--gray-200); box-shadow: var(--shadow-sm); background: #f9fafb;">
-              <!-- El mapa de Google se inyectará aquí automáticamente -->
-              <iframe id="google-map-iframe" width="100%" height="100%" frameborder="0" loading="lazy" allowfullscreen referrerpolicy="no-referrer-when-downgrade" style="border:0" src=""></iframe>
-            </div>
+            <p class="barb-section-sub" id="barb-direccion-texto">Localización de la barbería.</p>
+            <div id="mapa-cliente" style="height: 300px; border-radius: var(--radius-xl); background: #eee; border: 1px solid var(--gray-200); z-index: 1; display: none;"></div>
           </div>
         </main>
 
-        <!-- Sticky: resumen + form -->
         <aside class="barb-aside" id="barb-aside">
           <div id="aside-empty" class="aside-empty">
             <div style="font-size:2.5rem;margin-bottom:.75rem">👆</div>
@@ -100,14 +92,12 @@
               <div id="sesion-badge" class="sesion-badge hidden"></div>
               <div class="form-group">
                 <label for="cl-nombre">Nombre completo</label>
-                <!-- Validación de letras -->
                 <input id="cl-nombre" type="text" placeholder="Tu nombre" required data-tipo="letras">
                 <span class="field-error" id="err-cl-nombre"></span>
               </div>
               <div class="form-group">
                 <label for="cl-tel">Teléfono</label>
-                <!-- Validación de números corregida -->
-                <input id="cl-tel" type="tel" placeholder="0999999999" required data-tipo="numeros">
+                <input id="cl-tel" type="tel" placeholder="+54 9 11 0000-0000" required data-tipo="telefono">
                 <span class="field-error" id="err-cl-tel"></span>
               </div>
               <div class="form-row">
@@ -138,7 +128,6 @@
     </div>
   </div>
 
-  <!-- MODAL ÉXITO -->
   <div id="modal-exito" class="modal-overlay hidden">
     <div class="modal-box" style="text-align:center;padding:2.5rem">
       <div class="modal-check-icon">✓</div>
@@ -162,10 +151,8 @@
     <div class="footer-bottom"><span>© 2026 SyncBook</span><span>Powered by <span class="footer-purple">Supabase</span></span></div>
   </footer>
 
-  <!-- ✅ Google Maps: no requiere script externo, se usa Embed API vía iframe -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase.js"></script>
-  <script src="shared.js"></script> <!-- Aquí es donde ocurre la magia de la validación global -->
   <script src="barberia.js"></script>
 </body>
 </html>

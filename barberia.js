@@ -89,22 +89,17 @@ function poblarNegocio(n) {
     if (link) { link.href = `tel:${n.telefono}`; link.style.display = ''; }
   }
 
-  // Google Maps Embed
   if (n.latitud && n.longitud) {
-    const contenedor = document.getElementById('contenedor-mapa');
-    const iframe     = document.getElementById('google-map-iframe');
-    const dirLabel   = document.getElementById('mapa-texto-direccion');
-
-    if (contenedor && iframe) {
-      // Texto de dirección debajo del título
-      if (dirLabel) dirLabel.textContent = n.direccion || n.ciudad || '';
-
-      // Google Maps Embed API — reemplaza YOUR_GOOGLE_MAPS_API_KEY con tu clave real
-      const GMAPS_KEY = 'YOUR_GOOGLE_MAPS_API_KEY';
-      const q         = encodeURIComponent(n.direccion || `${n.latitud},${n.longitud}`);
-      iframe.src = `https://www.google.com/maps/embed/v1/place?key=${GMAPS_KEY}&q=${q}&center=${n.latitud},${n.longitud}&zoom=16&language=es`;
-
-      contenedor.classList.remove('hidden');
+    const mapDiv = document.getElementById('mapa-cliente');
+    if (mapDiv) {
+      mapDiv.style.display = 'block'; 
+      const mapaCli = L.map('mapa-cliente').setView([n.latitud, n.longitud], 15);
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; OpenStreetMap, &copy; CARTO'
+      }).addTo(mapaCli);
+      
+      L.marker([n.latitud, n.longitud]).addTo(mapaCli)
+        .bindPopup(`<b>${n.nombre}</b><br>${n.direccion || n.ciudad || ''}`).openPopup();
     }
   }
 }
