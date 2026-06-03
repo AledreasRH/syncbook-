@@ -89,36 +89,32 @@ function poblarNegocio(n) {
     if (link) { link.href = `tel:${n.telefono}`; link.style.display = ''; }
   }
 
-  // === MAPA + DIRECCIONES con SerpApi Google Maps Directions API ===
-  if (n.latitud && n.longitud) {
-    const contenedor = document.getElementById('contenedor-mapa');
-    const iframe     = document.getElementById('google-map-iframe');
-    const dirLabel   = document.getElementById('mapa-texto-direccion');
+if (n.latitud && n.longitud) {
+    const mapDiv = document.getElementById('mapa-cliente');
+    if (mapDiv) {
+      mapDiv.style.display = 'block';
 
-    if (contenedor) {
-      if (dirLabel) dirLabel.textContent = n.direccion || n.ciudad || '';
-
-      // Embed estático de Google Maps (no requiere key para vista básica)
-      if (iframe) {
-        const q = encodeURIComponent(n.direccion ? `${n.direccion}, ${n.ciudad || ''}` : `${n.latitud},${n.longitud}`);
-        iframe.src = `https://maps.google.com/maps?q=${q}&z=16&output=embed&hl=es`;
+      // Botón "Cómo llegar" con link a Google Maps
+      const btnLlegar = document.getElementById('btn-como-llegar');
+      if (btnLlegar) {
+        btnLlegar.href = `https://www.google.com/maps/dir/?api=1&destination=${n.latitud},${n.longitud}`;
+        btnLlegar.style.display = '';
       }
 
-      contenedor.classList.remove('hidden');
+      // Inicializar mapa Leaflet
+      const mapaCli = L.map(mapDiv, { zoomControl: true }).setView([n.latitud, n.longitud], 16);
 
-      // Botón "Cómo llegar" → abre Google Maps Directions en nueva pestaña
-      const btnDir = document.getElementById('btn-como-llegar');
-      if (btnDir) {
-        const destCoords = `${n.latitud},${n.longitud}`;
-        btnDir.href = `https://www.google.com/maps/dir/?api=1&destination=${destCoords}&travelmode=driving`;
-        btnDir.style.display = '';
-      }
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+        maxZoom: 19
+      }).addTo(mapaCli);
 
-      // Cargar direcciones con SerpApi si hay coordenadas del negocio
-      cargarDirecciones(n);
+      const marker = L.marker([n.latitud, n.longitud])
+        .addTo(mapaCli)
+        .bindPopup(`<div style="font-family:sans-serif;"><b>${n.nombre}</b><br>${n.direccion || n.ciudad || ''}</div>`)
+        .openPopup();
     }
   }
-  // =================================================================
 }
 
 async function cargarServicios(negocioId) {
@@ -277,103 +273,4 @@ function calcularHoraFin(horaStr, min) {
   const [h, m] = horaStr.split(':').map(Number);
   const t = h * 60 + m + min;
   return `${String(Math.floor(t / 60) % 24).padStart(2,'0')}:${String(t % 60).padStart(2,'0')}`;
-}
-
-// ============================================================
-// SERPAPI — Google Maps Directions
-// Reemplaza 'YOUR_SERPAPI_KEY' con tu clave real de serpapi.com
-// ============================================================
-const SERPAPI_KEY = 'YOUR_SERPAPI_KEY';
-
-const MODO_ICONO = { Driving:'🚗', Walking:'🚶', Cycling:'🚲', Transit:'🚌', Flight:'✈️' };
-const MODO_ES    = { Driving:'En auto', Walking:'Caminando', Cycling:'En bici', Transit:'Transporte', Flight:'Vuelo' };
-
-async function cargarDirecciones(n) {
-  const wrapper = document.getElementById('direcciones-wrapper');
-  if (!wrapper) return;
-
-  // Pedir ubicación al usuario
-  if (!navigator.geolocation) {
-    wrapper.innerHTML = `<p class="dir-nota">Tu navegador no soporta geolocalización. <a href="https://www.google.com/maps/dir/?api=1&destination=${n.latitud},${n.longitud}" target="_blank" class="dir-link">Abrir en Google Maps →</a></p>`;
-    return;
-  }
-
-  wrapper.innerHTML = `<div class="dir-loading"><span class="spinner spinner-dark" style="width:18px;height:18px;border-width:2px;display:inline-block;vertical-align:middle;margin-right:.5rem"></span> Obteniendo tu ubicación...</div>`;
-
-  navigator.geolocation.getCurrentPosition(
-    async (pos) => {
-      const { latitude: lat, longitude: lng } = pos.coords;
-      wrapper.innerHTML = `<div class="dir-loading"><span class="spinner spinner-dark" style="width:18px;height:18px;border-width:2px;display:inline-block;vertical-align:middle;margin-right:.5rem"></span> Calculando rutas...</div>`;
-
-      try {
-        // SerpApi no admite llamadas directas desde el browser por CORS.
-        // Se usa un proxy público de CORS solo para demostración.
-        // En producción, hacer esta llamada desde tu propio backend/edge function.
-        const endCoords  = `${n.latitud},${n.longitud}`;
-        const startCoords = `${lat},${lng}`;
-        const url = `https://serpapi.com/search.json?engine=google_maps_directions&start_coords=${startCoords}&end_coords=${endCoords}&hl=es&gl=ec&distance_unit=0&api_key=${SERPAPI_KEY}`;
-
-        // Proxy CORS para llamadas desde el browser (solo desarrollo)
-        const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(url)}`;
-
-        const res  = await fetch(proxyUrl);
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
-
-        if (!data.directions || !data.directions.length) {
-          wrapper.innerHTML = `<p class="dir-nota">No se encontraron rutas. <a href="https://www.google.com/maps/dir/${lat},${lng}/${endCoords}" target="_blank" class="dir-link">Ver en Google Maps →</a></p>`;
-          return;
-        }
-
-        // Renderizar tarjetas de rutas
-        const tarjetas = data.directions.slice(0, 4).map(d => {
-          const modo  = d.travel_mode || '';
-          const icono = MODO_ICONO[modo] || '📍';
-          const label = MODO_ES[modo]   || modo;
-          const via   = d.via ? `<span class="dir-via">vía ${d.via}</span>` : '';
-          const exts  = (d.extensions || []).map(e => `<span class="dir-ext">${e}</span>`).join('');
-          return `
-            <div class="dir-card">
-              <div class="dir-card-top">
-                <span class="dir-modo-icon">${icono}</span>
-                <div class="dir-card-info">
-                  <span class="dir-modo-label">${label}</span>
-                  ${via}
-                </div>
-                <div class="dir-card-tiempo">
-                  <strong>${d.formatted_duration || '—'}</strong>
-                  <span>${d.formatted_distance || ''}</span>
-                </div>
-              </div>
-              ${exts ? `<div class="dir-exts">${exts}</div>` : ''}
-            </div>`;
-        }).join('');
-
-        const gmapsLink = `https://www.google.com/maps/dir/${lat},${lng}/${n.latitud},${n.longitud}`;
-
-        wrapper.innerHTML = `
-          <div class="dir-header">
-            <span class="dir-desde">Desde tu ubicación actual</span>
-            <a href="${gmapsLink}" target="_blank" rel="noopener" class="dir-link">Abrir en Google Maps →</a>
-          </div>
-          <div class="dir-cards">${tarjetas}</div>`;
-
-      } catch (err) {
-        console.warn('SerpApi directions error:', err);
-        // Fallback graceful: solo mostrar link a Google Maps
-        const gmapsLink = `https://www.google.com/maps/dir/${lat},${lng}/${n.latitud},${n.longitud}`;
-        wrapper.innerHTML = `
-          <div class="dir-header">
-            <span class="dir-desde">Desde tu ubicación actual</span>
-            <a href="${gmapsLink}" target="_blank" rel="noopener" class="dir-link">Ver cómo llegar en Google Maps →</a>
-          </div>`;
-      }
-    },
-    () => {
-      // Usuario denegó geolocalización — mostrar link genérico
-      const gmapsLink = `https://www.google.com/maps/dir/?api=1&destination=${n.latitud},${n.longitud}&travelmode=driving`;
-      wrapper.innerHTML = `<p class="dir-nota">Activa la ubicación para ver rutas. <a href="${gmapsLink}" target="_blank" rel="noopener" class="dir-link">Abrir en Google Maps →</a></p>`;
-    },
-    { timeout: 8000, maximumAge: 60000 }
-  );
 }

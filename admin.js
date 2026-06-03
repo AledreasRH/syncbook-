@@ -77,39 +77,59 @@ window.addEventListener('DOMContentLoaded', async () => {
     renderServicios([]);
   }
 
+  // === LEAFLET — selector de ubicación en admin (sin API key) ===
   if (mapDiv) {
-    mapaAdmin = L.map('mapa-negocio').setView([latInicial, lngInicial], 14);
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-      attribution: '&copy; OpenStreetMap, &copy; CARTO'
-    }).addTo(mapaAdmin);
-    marcadorAdmin = L.marker([latInicial, lngInicial], { draggable: true }).addTo(mapaAdmin);
-
     document.getElementById('edit-lat').value = latInicial;
     document.getElementById('edit-lng').value = lngInicial;
 
-    marcadorAdmin.on('dragend', function() {
+    // Destruir mapa previo si existe
+    if (mapaAdmin) { mapaAdmin.remove(); mapaAdmin = null; marcadorAdmin = null; }
+
+    mapaAdmin = L.map(mapDiv).setView([latInicial, lngInicial], 15);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+      maxZoom: 19
+    }).addTo(mapaAdmin);
+
+    marcadorAdmin = L.marker([latInicial, lngInicial], { draggable: true })
+      .addTo(mapaAdmin)
+      .bindPopup('Arrastrá para mover la ubicación')
+      .openPopup();
+
+    // Arrastrar marcador → actualizar inputs
+    marcadorAdmin.on('dragend', () => {
       const pos = marcadorAdmin.getLatLng();
       document.getElementById('edit-lat').value = pos.lat;
       document.getElementById('edit-lng').value = pos.lng;
     });
 
-    document.getElementById('nav-btn-negocio')?.addEventListener('click', () => {
-      setTimeout(() => mapaAdmin.invalidateSize(), 150);
+    // Click en el mapa → mover marcador
+    mapaAdmin.on('click', (e) => {
+      marcadorAdmin.setLatLng(e.latlng);
+      document.getElementById('edit-lat').value = e.latlng.lat;
+      document.getElementById('edit-lng').value = e.latlng.lng;
     });
 
+    // Abrir pestaña Mi negocio → refrescar mapa (Leaflet necesita invalidateSize)
+    document.getElementById('nav-btn-negocio')?.addEventListener('click', () => {
+      setTimeout(() => { if (mapaAdmin) mapaAdmin.invalidateSize(); }, 200);
+    });
+
+    // Botón "📍 Ubicación actual"
     document.getElementById('btn-ubicacion-admin')?.addEventListener('click', () => {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition((position) => {
-          const lat = position.coords.latitude;
-          const lng = position.coords.longitude;
-          marcadorAdmin.setLatLng([lat, lng]);
-          mapaAdmin.setView([lat, lng], 16);
-          document.getElementById('edit-lat').value = lat;
-          document.getElementById('edit-lng').value = lng;
-        });
-      }
+      if (!navigator.geolocation) return;
+      navigator.geolocation.getCurrentPosition((position) => {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+        if (marcadorAdmin) marcadorAdmin.setLatLng([lat, lng]);
+        if (mapaAdmin) mapaAdmin.setView([lat, lng], 16);
+        document.getElementById('edit-lat').value = lat;
+        document.getElementById('edit-lng').value = lng;
+      }, () => showToast('No se pudo obtener la ubicación.', 'error'));
     });
   }
+  // ======================================================
 
   document.getElementById('btn-logout')?.addEventListener('click', async () => {
     await window.sb.auth.signOut(); window.location.href = 'login.html';
@@ -446,10 +466,10 @@ function llenarFormNegocio(n) {
   document.getElementById('edit-lat').value    = n.latitud || '';
   document.getElementById('edit-lng').value    = n.longitud || '';
   
-  if (marcadorAdmin && n.latitud && n.longitud) {
-    const pos = [n.latitud, n.longitud];
-    marcadorAdmin.setLatLng(pos);
-    mapaAdmin.setView(pos, 14);
+  // Actualizar mapa Leaflet con la posición guardada
+  if (n.latitud && n.longitud) {
+    if (marcadorAdmin) marcadorAdmin.setLatLng([n.latitud, n.longitud]);
+    if (mapaAdmin) mapaAdmin.setView([n.latitud, n.longitud], 15);
   }
 }
 

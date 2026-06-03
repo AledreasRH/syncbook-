@@ -106,3 +106,17 @@ body{background:var(--gray-50);overflow-x:hidden}
   .adm-stats-grid{grid-template-columns:1fr 1fr}
   .adm-page-header{flex-direction:column;align-items:flex-start}
 }
+
+/* === Mapa Leaflet admin === */
+#mapa-negocio {
+  height: 280px;
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--gray-300);
+  overflow: hidden;
+  background: #f0f0f0;
+  position: relative;
+  z-index: 1;
+}
+#mapa-negocio .leaflet-container { border-radius: var(--radius-md); }
+/* Asegurar que el mapa ocupe todo el espacio */
+#mapa-negocio > .leaflet-container { width: 100% !important; height: 100% !important; }
