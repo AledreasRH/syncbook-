@@ -21,13 +21,15 @@ window.addEventListener('DOMContentLoaded', async () => {
     window.location.href = 'mis-citas.html'; return;
   }
 
-  // VALIDACIÓN ESTRICTA EN TIEMPO REAL (Letras vs Números) en el Admin
-  document.querySelectorAll('input').forEach(input => {
+  // VALIDACIÓN ESTRICTA EN TIEMPO REAL (Letras vs Números vs Teléfono) en el Admin
+  document.querySelectorAll('input[data-tipo]').forEach(input => {
     input.addEventListener('input', function() {
       if (this.dataset.tipo === 'letras') {
         this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '');
-      } else if (this.dataset.tipo === 'telefono' || this.dataset.tipo === 'numeros') {
-        this.value = this.value.replace(/[^0-9+\- ]/g, '');
+      } else if (this.dataset.tipo === 'numeros') {
+        this.value = this.value.replace(/[^0-9]/g, '');
+      } else if (this.dataset.tipo === 'telefono') {
+        this.value = this.value.replace(/[^0-9+\s()\-]/g, '');
       }
     });
   });

@@ -27,13 +27,15 @@ window.addEventListener('DOMContentLoaded', async () => {
   }
   // ==========================================
 
-  // VALIDACIÓN EN TIEMPO REAL (Letras vs Números)
-  document.querySelectorAll('input').forEach(input => {
+  // VALIDACIÓN EN TIEMPO REAL (Letras vs Números vs Teléfono)
+  document.querySelectorAll('input[data-tipo]').forEach(input => {
     input.addEventListener('input', function() {
       if (this.dataset.tipo === 'letras') {
         this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '');
       } else if (this.dataset.tipo === 'numeros') {
-        this.value = this.value.replace(/[^0-9+\- ]/g, '');
+        this.value = this.value.replace(/[^0-9]/g, '');
+      } else if (this.dataset.tipo === 'telefono') {
+        this.value = this.value.replace(/[^0-9+\s()\-]/g, '');
       }
     });
   });
