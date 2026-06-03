@@ -21,7 +21,23 @@ window.addEventListener('DOMContentLoaded', async () => {
     window.location.href = 'mis-citas.html'; return;
   }
 
-  // VALIDACIÓN ESTRICTA GLOBAL (Letras, Números y Teléfonos sin salto de cursor)
+  // === VISTA PREVIA DE IMÁGENES AL SELECCIONAR ===
+  document.getElementById('edit-logo-file')?.addEventListener('change', function(e) {
+    if (this.files && this.files[0]) {
+      const p = document.getElementById('preview-logo');
+      p.src = URL.createObjectURL(this.files[0]);
+      p.style.display = 'block';
+    }
+  });
+
+  document.getElementById('edit-portada-file')?.addEventListener('change', function(e) {
+    if (this.files && this.files[0]) {
+      const p = document.getElementById('preview-portada');
+      p.src = URL.createObjectURL(this.files[0]);
+      p.style.display = 'block';
+    }
+  });
+
   document.addEventListener('input', function(e) {
     const input = e.target;
     if (!input.dataset.tipo) return;
@@ -40,9 +56,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     if (originalValue !== newValue) {
       let start = input.selectionStart;
       let end = input.selectionEnd;
-      
       input.value = newValue;
-      
       try { input.setSelectionRange(start - 1, end - 1); } catch (err) {}
     }
   });
@@ -92,12 +106,10 @@ window.addEventListener('DOMContentLoaded', async () => {
     renderServicios([]);
   }
 
-  // === LEAFLET — selector de ubicación en admin (sin API key) ===
   if (mapDiv) {
     document.getElementById('edit-lat').value = latInicial;
     document.getElementById('edit-lng').value = lngInicial;
 
-    // Destruir mapa previo si existe
     if (mapaAdmin) { mapaAdmin.remove(); mapaAdmin = null; marcadorAdmin = null; }
 
     mapaAdmin = L.map(mapDiv).setView([latInicial, lngInicial], 15);
@@ -109,29 +121,21 @@ window.addEventListener('DOMContentLoaded', async () => {
 
     marcadorAdmin = L.marker([latInicial, lngInicial], { draggable: true })
       .addTo(mapaAdmin)
-      .bindPopup('Arrastrá para mover la ubicación')
+      .bindPopup('<span style="white-space: nowrap;">Arrastrá para mover la ubicación</span>')
       .openPopup();
 
-    // Arrastrar marcador → actualizar inputs
     marcadorAdmin.on('dragend', () => {
       const pos = marcadorAdmin.getLatLng();
       document.getElementById('edit-lat').value = pos.lat;
       document.getElementById('edit-lng').value = pos.lng;
     });
 
-    // Click en el mapa → mover marcador
     mapaAdmin.on('click', (e) => {
       marcadorAdmin.setLatLng(e.latlng);
       document.getElementById('edit-lat').value = e.latlng.lat;
       document.getElementById('edit-lng').value = e.latlng.lng;
     });
 
-    // Abrir pestaña Mi negocio → refrescar mapa (Leaflet necesita invalidateSize)
-    document.getElementById('nav-btn-negocio')?.addEventListener('click', () => {
-      setTimeout(() => { if (mapaAdmin) mapaAdmin.invalidateSize(); }, 200);
-    });
-
-    // Botón "📍 Ubicación actual"
     document.getElementById('btn-ubicacion-admin')?.addEventListener('click', () => {
       if (!navigator.geolocation) return;
       navigator.geolocation.getCurrentPosition((position) => {
@@ -144,7 +148,6 @@ window.addEventListener('DOMContentLoaded', async () => {
       }, () => showToast('No se pudo obtener la ubicación.', 'error'));
     });
   }
-  // ======================================================
 
   document.getElementById('btn-logout')?.addEventListener('click', async () => {
     await window.sb.auth.signOut(); window.location.href = 'login.html';
@@ -203,6 +206,15 @@ function cambiarPanel(panel, btn) {
   document.getElementById(`panel-${panel}`)?.classList.remove('hidden');
   if (btn) btn.classList.add('active');
   else document.querySelector(`[data-panel="${panel}"]`)?.classList.add('active');
+
+  if (panel === 'negocio' && mapaAdmin) {
+    setTimeout(() => {
+      mapaAdmin.invalidateSize();
+      const lat = parseFloat(document.getElementById('edit-lat').value) || -0.2298;
+      const lng = parseFloat(document.getElementById('edit-lng').value) || -78.5249;
+      mapaAdmin.setView([lat, lng], mapaAdmin.getZoom());
+    }, 100);
+  }
 }
 
 async function cargarCitas() {
@@ -479,12 +491,35 @@ function llenarFormNegocio(n) {
   
   document.getElementById('edit-lat').value    = n.latitud || '';
   document.getElementById('edit-lng').value    = n.longitud || '';
+
+  // Mostrar vistas previas si ya existen URLs guardadas
+  const prevLogo = document.getElementById('preview-logo');
+  const prevPortada = document.getElementById('preview-portada');
+  if (n.logo_url) { prevLogo.src = n.logo_url; prevLogo.style.display = 'block'; }
+  if (n.portada_url) { prevPortada.src = n.portada_url; prevPortada.style.display = 'block'; }
   
-  // Actualizar mapa Leaflet con la posición guardada
   if (n.latitud && n.longitud) {
     if (marcadorAdmin) marcadorAdmin.setLatLng([n.latitud, n.longitud]);
     if (mapaAdmin) mapaAdmin.setView([n.latitud, n.longitud], 15);
   }
+}
+
+// === LÓGICA PARA SUBIR IMÁGENES A SUPABASE ===
+async function subirImagenSupabase(file, usuarioId) {
+  const fileExt = file.name.split('.').pop();
+  const fileName = `${usuarioId}-${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+  
+  const { error: uploadError } = await window.sb.storage
+    .from('locales') // Nombre del Bucket
+    .upload(fileName, file);
+
+  if (uploadError) {
+    console.error(uploadError);
+    throw new Error("Error al subir la imagen. Verifica que el Storage 'locales' esté creado y sea público.");
+  }
+
+  const { data } = window.sb.storage.from('locales').getPublicUrl(fileName);
+  return data.publicUrl;
 }
 
 async function guardarNegocio(e) {
@@ -492,9 +527,32 @@ async function guardarNegocio(e) {
   setBtnState('btn-guardar-negocio', true, 'Guardando...');
   setMsgNegocio('', '');
   try {
+    const { data: { session } } = await window.sb.auth.getSession();
+
+    // Mantener las URLs antiguas por si el usuario no sube fotos nuevas
+    let logoUrlFinal = negocioActual ? negocioActual.logo_url : null;
+    let portadaUrlFinal = negocioActual ? negocioActual.portada_url : null;
+
+    const fileLogo = document.getElementById('edit-logo-file').files[0];
+    const filePortada = document.getElementById('edit-portada-file').files[0];
+
+    // Subir logo si hay archivo seleccionado
+    if (fileLogo) {
+      setBtnState('btn-guardar-negocio', true, 'Subiendo logo...');
+      logoUrlFinal = await subirImagenSupabase(fileLogo, session.user.id);
+    }
+    
+    // Subir portada si hay archivo seleccionado
+    if (filePortada) {
+      setBtnState('btn-guardar-negocio', true, 'Subiendo portada...');
+      portadaUrlFinal = await subirImagenSupabase(filePortada, session.user.id);
+    }
+
     const updates = {
       nombre:         document.getElementById('edit-nombre').value.trim(),
       descripcion:    document.getElementById('edit-desc').value.trim() || null,
+      logo_url:       logoUrlFinal, // URL generada automáticamente
+      portada_url:    portadaUrlFinal, // URL generada automáticamente
       ciudad:         document.getElementById('edit-ciudad').value.trim() || null,
       telefono:       document.getElementById('edit-tel').value.trim() || null,
       direccion:      document.getElementById('edit-dir').value.trim() || null,
@@ -503,8 +561,6 @@ async function guardarNegocio(e) {
       horario_inicio: document.getElementById('edit-h1').value || null,
       horario_fin:    document.getElementById('edit-h2').value || null,
     };
-
-    const { data: { session } } = await window.sb.auth.getSession();
 
     if (negocioActual && negocioActual.id) {
       const { error } = await window.sb.from('negocios').update(updates).eq('id', negocioActual.id);
@@ -519,7 +575,7 @@ async function guardarNegocio(e) {
       if (error) throw error;
 
       negocioActual = data;
-      setMsgNegocio('✅ Negocio creado correctamente desde tu panel.', 'success');
+      setMsgNegocio('✅ Negocio creado correctamente.', 'success');
 
       const linkUrl = `${window.location.origin}${window.location.pathname.replace('admin.html','')}barberia.html?id=${negocioActual.id}`;
       document.getElementById('adm-link-url').textContent = linkUrl;

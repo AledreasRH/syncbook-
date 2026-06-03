@@ -107,9 +107,32 @@
         <div class="adm-page-header"><div><h1 class="adm-page-title">Mi negocio</h1><p class="adm-page-sub">Editá o creá la información de tu barbería.</p></div></div>
         <div class="adm-section-card" style="max-width:640px">
           <form id="form-negocio-edit" novalidate style="display:flex;flex-direction:column;gap:1.1rem">
-            <div class="form-group"><label>Nombre del negocio *</label><input id="edit-nombre" type="text" required data-tipo="letras"></div>
             
+            <div class="form-group"><label>Nombre del negocio *</label><input id="edit-nombre" type="text" required data-tipo="letras"></div>
             <div class="form-group"><label>Descripción</label><textarea id="edit-desc" rows="3"></textarea></div>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label>Logo de la barbería</label>
+                <div style="position:relative; border:2px dashed var(--gray-300); border-radius:var(--radius-md); padding:1.5rem 1rem; text-align:center; background:#f9fafb; cursor:pointer; transition:all 0.2s;">
+                  <span style="font-size:1.8rem">📷</span>
+                  <p style="font-size:0.8rem; color:var(--gray-600); margin-top:0.5rem; font-weight:600;">Toca para subir logo</p>
+                  <input id="edit-logo-file" type="file" accept="image/png, image/jpeg, image/webp" style="position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%;">
+                </div>
+                <img id="preview-logo" style="width: 80px; height: 80px; object-fit: cover; border-radius: 50%; margin: 0.75rem auto 0; display: none; border: 3px solid #fff; box-shadow: var(--shadow-md);">
+              </div>
+
+              <div class="form-group">
+                <label>Portada de la barbería</label>
+                <div style="position:relative; border:2px dashed var(--gray-300); border-radius:var(--radius-md); padding:1.5rem 1rem; text-align:center; background:#f9fafb; cursor:pointer; transition:all 0.2s;">
+                  <span style="font-size:1.8rem">🖼️</span>
+                  <p style="font-size:0.8rem; color:var(--gray-600); margin-top:0.5rem; font-weight:600;">Toca para subir portada</p>
+                  <input id="edit-portada-file" type="file" accept="image/png, image/jpeg, image/webp" style="position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%;">
+                </div>
+                <img id="preview-portada" style="width: 100%; height: 100px; object-fit: cover; border-radius: var(--radius-md); margin-top: 0.75rem; display: none; border: 1px solid var(--gray-200); box-shadow: var(--shadow-sm);">
+              </div>
+            </div>
+            
             <div class="form-row">
               <div class="form-group"><label>Ciudad</label><input id="edit-ciudad" type="text" data-tipo="letras"></div>
               <div class="form-group"><label>Teléfono</label><input id="edit-tel" type="tel" data-tipo="telefono"></div>

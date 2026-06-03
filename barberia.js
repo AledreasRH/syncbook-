@@ -96,8 +96,14 @@ function poblarNegocio(n) {
   const dirTexto = document.getElementById('barb-direccion-texto');
   if (dirTexto && n.direccion) dirTexto.textContent = n.direccion;
 
+  // === RENDERIZADO DEL LOGO Y LA PORTADA QUE SUBIÓ EL ADMIN ===
   if (n.logo_url) {
     document.getElementById('barb-logo').innerHTML = `<img src="${n.logo_url}" alt="${n.nombre}">`;
+  }
+  
+  if (n.portada_url) {
+    document.getElementById('barb-cover').innerHTML = `<img src="${n.portada_url}" alt="${n.nombre}" style="width:100%;height:100%;object-fit:cover;filter:brightness(.6)">`;
+  } else if (n.logo_url) {
     document.getElementById('barb-cover').innerHTML = `<img src="${n.logo_url}" alt="${n.nombre}" style="width:100%;height:100%;object-fit:cover;filter:blur(8px) brightness(.5)">`;
   }
   
@@ -106,23 +112,18 @@ function poblarNegocio(n) {
     if (link) { link.href = `tel:${n.telefono}`; link.style.display = ''; }
   }
 
-if (n.latitud && n.longitud) {
+  if (n.latitud && n.longitud) {
     const mapDiv = document.getElementById('mapa-cliente');
     if (mapDiv) {
-      // Mostrar el div ANTES de inicializar Leaflet
       mapDiv.style.display = 'block';
-
-      // Botón "Cómo llegar"
       const btnLlegar = document.getElementById('btn-como-llegar');
       if (btnLlegar) {
         btnLlegar.href = `https://www.google.com/maps/dir/?api=1&destination=${n.latitud},${n.longitud}`;
         btnLlegar.style.display = '';
       }
 
-      // Delay para que el navegador pinte el div antes de inicializar el mapa
       setTimeout(() => {
         const mapaCli = L.map(mapDiv, { zoomControl: true }).setView([n.latitud, n.longitud], 16);
-
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
           attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
           maxZoom: 19
@@ -133,7 +134,6 @@ if (n.latitud && n.longitud) {
           .bindPopup(`<div style="font-family:sans-serif;font-size:.9rem"><b>${n.nombre}</b><br>${n.direccion || n.ciudad || ''}</div>`)
           .openPopup();
 
-        // Forzar recalculo de tamaño por si el layout tardó en renderizarse
         setTimeout(() => mapaCli.invalidateSize(), 300);
       }, 50);
     }
@@ -230,7 +230,6 @@ async function enviarReserva(e) {
   const hora   = document.getElementById('cl-hora').value;
   const notas  = document.getElementById('cl-notas').value.trim();
 
-  // Validaciones visuales mejoradas
   ['err-cl-nombre','err-cl-tel','err-cl-fecha','err-cl-hora'].forEach(id => { const e=document.getElementById(id); if(e) e.textContent=''; });
   let ok = true;
   if (!nombre || nombre.length < 3) { document.getElementById('err-cl-nombre').textContent='Ingresa un nombre válido (mínimo 3 letras).'; ok=false; }
@@ -300,7 +299,6 @@ function poblarSelectHoras() {
   const ahora = new Date();
   const intervalo = servicioActivo?.duracion_minutos || 30;
 
-  // Parsear límites
   const [hA, mA] = abre.split(':').map(Number);
   const [hC, mC] = cierra.split(':').map(Number);
   const minAbre   = hA * 60 + mA;
@@ -313,7 +311,6 @@ function poblarSelectHoras() {
     const mm = String(min % 60).padStart(2, '0');
     const valor = `${hh}:${mm}`;
 
-    // Si la fecha elegida es hoy, ocultar horas que ya pasaron
     if (fechaVal === fechaHoy()) {
       const slotDate = new Date();
       slotDate.setHours(Math.floor(min / 60), min % 60, 0, 0);

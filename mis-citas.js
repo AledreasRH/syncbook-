@@ -1,5 +1,5 @@
 /* SyncBook · mis-citas.js */
-let misCitas=[], citaACancelar=null, usuarioActual=null;
+let misCitas=[], citaACancelar=null, usuarioActual=null, _tickTimer=null;
 window.addEventListener('DOMContentLoaded', async () => {
   initNavbar('mis-citas.html');
   if (!window.sb) { mostrarSinSesion(); return; }
@@ -16,6 +16,8 @@ window.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('mc-si')?.addEventListener('click', confirmarCancelacion);
   document.getElementById('modal-cancelar')?.addEventListener('click',e=>{ if(e.target.id==='modal-cancelar') cerrarModal(); });
   await cargarCitas();
+  // Re-distribuir automáticamente cada minuto para mover citas que ya pasaron
+  _tickTimer = setInterval(() => distribuir(), 60 * 1000);
 });
 function mostrarSinSesion(){ document.getElementById('vista-sin-sesion')?.classList.remove('hidden'); document.getElementById('vista-con-sesion')?.classList.add('hidden'); }
 async function cargarCitas(){
@@ -28,10 +30,15 @@ async function cargarCitas(){
     distribuir();
   } catch(err){ console.error(err); misCitas=[]; distribuir(); }
 }
+function citaYaPaso(c) {
+  // Construye un Date comparable: "2025-07-15T18:30" usando hora_fin (o hora_inicio como fallback)
+  const horaRef = c.hora_fin || c.hora_inicio || '23:59';
+  const dt = new Date(`${c.fecha}T${horaRef}`);
+  return dt < new Date();
+}
 function distribuir(){
-  const hoy=fechaHoy();
-  const prox=misCitas.filter(c=>c.fecha>=hoy&&c.estado!=='cancelada');
-  const pas=misCitas.filter(c=>c.fecha<hoy||c.estado==='cancelada');
+  const prox=misCitas.filter(c=>!citaYaPaso(c)&&c.estado!=='cancelada');
+  const pas=misCitas.filter(c=>citaYaPaso(c)||c.estado==='cancelada');
   document.getElementById('badge-proximas').textContent=prox.length;
   document.getElementById('badge-pasadas').textContent=pas.length;
   renderCitas('lista-proximas','empty-proximas',prox,true);
