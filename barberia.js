@@ -206,7 +206,11 @@ function autocompletar(user) {
 
 async function enviarReserva(e) {
   e.preventDefault();
-  if (!servicioActivo || !negocio) return;
+  if (!negocio) return;
+  if (!servicioActivo) {
+    setMsg('Selecciona un servicio antes de reservar.', 'error');
+    return;
+  }
 
   const nombre = document.getElementById('cl-nombre').value.trim();
   const tel    = document.getElementById('cl-tel').value.trim();
@@ -221,6 +225,7 @@ async function enviarReserva(e) {
   if (!tel || tel.replace(/\D/g,'').length < 7) { document.getElementById('err-cl-tel').textContent='Teléfono inválido (mínimo 7 números).'; ok=false; }
   if (!fecha || fecha < fechaHoy()) { document.getElementById('err-cl-fecha').textContent='La fecha no puede estar en el pasado.'; ok=false; }
   if (!hora) { document.getElementById('err-cl-hora').textContent='Elegí una hora.'; ok=false; }
+  if (hora && !validarHoraSeleccionada(hora)) { document.getElementById('err-cl-hora').textContent='El horario no está disponible para este servicio o no es válido.'; ok=false; }
   if (!ok) return;
 
   setBtnLoading(true); setMsg('','');
@@ -314,4 +319,19 @@ function calcularHoraFin(horaStr, min) {
   const [h, m] = horaStr.split(':').map(Number);
   const t = h * 60 + m + min;
   return `${String(Math.floor(t / 60) % 24).padStart(2,'0')}:${String(t % 60).padStart(2,'0')}`;
+}
+
+function validarHoraSeleccionada(hora) {
+  if (!servicioActivo || !negocio) return false;
+  const intervalo = servicioActivo.duracion_minutos || 30;
+  const [hA, mA] = (negocio.horario_inicio || '08:00').split(':').map(Number);
+  const [hC, mC] = (negocio.horario_fin || '20:00').split(':').map(Number);
+  const [h, m] = hora.split(':').map(Number);
+  if ([h, m, hA, mA, hC, mC].some(v => Number.isNaN(v))) return false;
+
+  const minHora = h * 60 + m;
+  const minAbre = hA * 60 + mA;
+  const minCierra = hC * 60 + mC;
+  if (minHora < minAbre || minHora + intervalo > minCierra) return false;
+  return ((minHora - minAbre) % intervalo) === 0;
 }
