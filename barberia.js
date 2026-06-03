@@ -34,6 +34,9 @@ window.addEventListener('DOMContentLoaded', async () => {
   }
 
   document.getElementById('cl-fecha').min = fechaHoy();
+  document.getElementById('cl-fecha')?.addEventListener('change', () => {
+    poblarSelectHoras();
+  });
   await cargarNegocio(negocioId);
 
   document.getElementById('form-reserva')?.addEventListener('submit', enviarReserva);
@@ -43,6 +46,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     limpiarServicio();
     document.getElementById('form-reserva').reset();
     document.getElementById('cl-fecha').min = fechaHoy();
+    poblarSelectHoras();
     if (usuarioSesion) autocompletar(usuarioSesion);
   });
   document.getElementById('modal-exito')?.addEventListener('click', e => {
@@ -63,6 +67,7 @@ async function cargarNegocio(id) {
     negocio = data;
     poblarNegocio(data);
     await cargarServicios(id);
+    poblarSelectHoras(); // Generar horarios con los datos reales del negocio
     document.getElementById('vista-loading')?.classList.add('hidden');
     document.getElementById('vista-barberia')?.classList.remove('hidden');
     document.title = `${data.nombre} · SyncBook`;
@@ -216,15 +221,6 @@ async function enviarReserva(e) {
   if (!hora) { document.getElementById('err-cl-hora').textContent='Elegí una hora.'; ok=false; }
   if (!ok) return;
 
-  if (negocio.horario_inicio && hora < negocio.horario_inicio) {
-    document.getElementById('err-cl-hora').textContent = `El negocio abre a las ${negocio.horario_inicio}.`;
-    return;
-  }
-  if (negocio.horario_fin && hora > negocio.horario_fin) {
-    document.getElementById('err-cl-hora').textContent = `El negocio cierra a las ${negocio.horario_fin}.`;
-    return;
-  }
-
   setBtnLoading(true); setMsg('','');
   try {
     const { data:conf } = await window.sb.from('citas')
@@ -273,6 +269,42 @@ function setBtnLoading(loading) {
   btn?.querySelector('.btn-text')?.classList.toggle('hidden',loading);
   btn?.querySelector('.btn-loader')?.classList.toggle('hidden',!loading);
   if(btn) btn.disabled=loading;
+}
+
+function poblarSelectHoras() {
+  const sel = document.getElementById('cl-hora');
+  if (!sel) return;
+
+  const abre  = (negocio?.horario_inicio || '08:00');
+  const cierra = (negocio?.horario_fin   || '20:00');
+  const fechaVal = document.getElementById('cl-fecha')?.value;
+  const ahora = new Date();
+
+  // Parsear límites
+  const [hA, mA] = abre.split(':').map(Number);
+  const [hC, mC] = cierra.split(':').map(Number);
+  const minAbre   = hA * 60 + mA;
+  const minCierra = hC * 60 + mC;
+
+  sel.innerHTML = '<option value="">Elegí un horario</option>';
+
+  for (let min = minAbre; min < minCierra; min += 30) {
+    const hh = String(Math.floor(min / 60)).padStart(2, '0');
+    const mm = String(min % 60).padStart(2, '0');
+    const valor = `${hh}:${mm}`;
+
+    // Si la fecha elegida es hoy, ocultar horas que ya pasaron
+    if (fechaVal === fechaHoy()) {
+      const slotDate = new Date();
+      slotDate.setHours(Math.floor(min / 60), min % 60, 0, 0);
+      if (slotDate <= ahora) continue;
+    }
+
+    const opt = document.createElement('option');
+    opt.value = valor;
+    opt.textContent = `${valor} hs`;
+    sel.appendChild(opt);
+  }
 }
 
 function calcularHoraFin(horaStr, min) {
