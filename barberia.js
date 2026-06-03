@@ -92,27 +92,33 @@ function poblarNegocio(n) {
 if (n.latitud && n.longitud) {
     const mapDiv = document.getElementById('mapa-cliente');
     if (mapDiv) {
+      // Mostrar el div ANTES de inicializar Leaflet
       mapDiv.style.display = 'block';
 
-      // Botón "Cómo llegar" con link a Google Maps
+      // Botón "Cómo llegar"
       const btnLlegar = document.getElementById('btn-como-llegar');
       if (btnLlegar) {
         btnLlegar.href = `https://www.google.com/maps/dir/?api=1&destination=${n.latitud},${n.longitud}`;
         btnLlegar.style.display = '';
       }
 
-      // Inicializar mapa Leaflet
-      const mapaCli = L.map(mapDiv, { zoomControl: true }).setView([n.latitud, n.longitud], 16);
+      // Delay para que el navegador pinte el div antes de inicializar el mapa
+      setTimeout(() => {
+        const mapaCli = L.map(mapDiv, { zoomControl: true }).setView([n.latitud, n.longitud], 16);
 
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-        maxZoom: 19
-      }).addTo(mapaCli);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+          maxZoom: 19
+        }).addTo(mapaCli);
 
-      const marker = L.marker([n.latitud, n.longitud])
-        .addTo(mapaCli)
-        .bindPopup(`<div style="font-family:sans-serif;"><b>${n.nombre}</b><br>${n.direccion || n.ciudad || ''}</div>`)
-        .openPopup();
+        L.marker([n.latitud, n.longitud])
+          .addTo(mapaCli)
+          .bindPopup(`<div style="font-family:sans-serif;font-size:.9rem"><b>${n.nombre}</b><br>${n.direccion || n.ciudad || ''}</div>`)
+          .openPopup();
+
+        // Forzar recalculo de tamaño por si el layout tardó en renderizarse
+        setTimeout(() => mapaCli.invalidateSize(), 300);
+      }, 50);
     }
   }
 }
