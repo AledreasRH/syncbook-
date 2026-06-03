@@ -170,6 +170,7 @@ function seleccionarServicio(s, card) {
   document.getElementById('aside-empty').classList.add('hidden');
   document.getElementById('aside-form').classList.remove('hidden');
   setMsg('','');
+  poblarSelectHoras();
   if (window.innerWidth <= 900) {
     document.getElementById('barb-aside')?.scrollIntoView({ behavior:'smooth', block:'start' });
   }
@@ -180,6 +181,7 @@ function limpiarServicio() {
   document.querySelectorAll('.barb-serv-card').forEach(c => c.classList.remove('selected'));
   document.getElementById('aside-empty').classList.remove('hidden');
   document.getElementById('aside-form').classList.add('hidden');
+  poblarSelectHoras();
 }
 
 function autocompletar(user) {
@@ -279,6 +281,7 @@ function poblarSelectHoras() {
   const cierra = (negocio?.horario_fin   || '20:00');
   const fechaVal = document.getElementById('cl-fecha')?.value;
   const ahora = new Date();
+  const intervalo = servicioActivo?.duracion_minutos || 30;
 
   // Parsear límites
   const [hA, mA] = abre.split(':').map(Number);
@@ -288,7 +291,7 @@ function poblarSelectHoras() {
 
   sel.innerHTML = '<option value="">Elegí un horario</option>';
 
-  for (let min = minAbre; min < minCierra; min += 30) {
+  for (let min = minAbre; min + intervalo <= minCierra; min += intervalo) {
     const hh = String(Math.floor(min / 60)).padStart(2, '0');
     const mm = String(min % 60).padStart(2, '0');
     const valor = `${hh}:${mm}`;
