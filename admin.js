@@ -21,17 +21,30 @@ window.addEventListener('DOMContentLoaded', async () => {
     window.location.href = 'mis-citas.html'; return;
   }
 
-  // VALIDACIÓN ESTRICTA EN TIEMPO REAL (Letras vs Números vs Teléfono) en el Admin
-  document.querySelectorAll('input[data-tipo]').forEach(input => {
-    input.addEventListener('input', function() {
-      if (this.dataset.tipo === 'letras') {
-        this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '');
-      } else if (this.dataset.tipo === 'numeros') {
-        this.value = this.value.replace(/[^0-9]/g, '');
-      } else if (this.dataset.tipo === 'telefono') {
-        this.value = this.value.replace(/[^0-9+\s()\-]/g, '');
-      }
-    });
+  // VALIDACIÓN ESTRICTA GLOBAL (Letras, Números y Teléfonos sin salto de cursor)
+  document.addEventListener('input', function(e) {
+    const input = e.target;
+    if (!input.dataset.tipo) return;
+
+    let originalValue = input.value;
+    let newValue = originalValue;
+
+    if (input.dataset.tipo === 'letras') {
+      newValue = originalValue.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '');
+    } else if (input.dataset.tipo === 'numeros') {
+      newValue = originalValue.replace(/[^0-9]/g, '');
+    } else if (input.dataset.tipo === 'telefono') {
+      newValue = originalValue.replace(/[^0-9+\s()\-]/g, '');
+    }
+
+    if (originalValue !== newValue) {
+      let start = input.selectionStart;
+      let end = input.selectionEnd;
+      
+      input.value = newValue;
+      
+      try { input.setSelectionRange(start - 1, end - 1); } catch (err) {}
+    }
   });
 
   const { data: listNegocios } = await window.sb
@@ -429,6 +442,7 @@ async function guardarServicio() {
   
   // === NUEVAS VALIDACIONES ESTRICTAS PARA SERVICIOS ===
   if (!nombre) { document.getElementById('err-serv-nombre').textContent = 'El nombre es obligatorio.'; return; }
+  if (/^\d+$/.test(nombre)) { document.getElementById('err-serv-nombre').textContent = 'El nombre no puede contener solo números.'; return; }
   if (dur < 5) { document.getElementById('err-serv-nombre').textContent = 'La duración debe ser al menos 5 min.'; return; }
   if (precio < 0) { document.getElementById('err-serv-nombre').textContent = 'El precio no puede ser negativo.'; return; }
   // ====================================================

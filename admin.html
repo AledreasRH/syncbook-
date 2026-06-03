@@ -5,11 +5,8 @@
   <title>Panel Admin · SyncBook</title>
   <link rel="stylesheet" href="shared.css">
   <link rel="stylesheet" href="admin.css">
-  <!-- Leaflet — mapa gratuito sin API key -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  
-  
 </head>
 <body>
   <div id="app-shell" class="adm-shell">
@@ -173,8 +170,8 @@
           <div class="form-group"><label>Nombre del servicio *</label><input id="serv-modal-nombre" type="text" placeholder="Ej: Corte + cejas" required><span class="field-error" id="err-serv-nombre"></span></div>
           <div class="form-group"><label>Descripción <span style="color:var(--gray-400);font-weight:400">(opcional)</span></label><textarea id="serv-modal-desc" rows="2" placeholder="Describí el servicio..."></textarea></div>
           <div class="form-row">
-            <div class="form-group"><label>Duración (minutos) *</label><input id="serv-modal-dur" type="number" min="5" max="300" data-tipo="numeros" value="30" required></div>
-            <div class="form-group"><label>Precio ($) *</label><input id="serv-modal-precio" type="number" min="0" step="50" data-tipo="numeros" value="0" required></div>
+            <div class="form-group"><label>Duración (minutos) *</label><input id="serv-modal-dur" type="text" inputmode="numeric" data-tipo="numeros" value="30" required></div>
+            <div class="form-group"><label>Precio ($) *</label><input id="serv-modal-precio" type="text" inputmode="numeric" data-tipo="numeros" value="0" required></div>
           </div>
         </form>
       </div>

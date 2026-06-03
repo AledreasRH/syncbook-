@@ -6,19 +6,31 @@ let usuarioSesion  = null;
 window.addEventListener('DOMContentLoaded', async () => {
   initNavbar('');
   
-  // === VALIDACIÓN ESTRICTA EN TIEMPO REAL PARA EL CLIENTE ===
-  document.querySelectorAll('input').forEach(input => {
-    input.addEventListener('input', function() {
-      if (this.dataset.tipo === 'letras') {
-        // Bloquea cualquier número o símbolo, solo permite letras y espacios
-        this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '');
-      } else if (this.dataset.tipo === 'telefono' || this.dataset.tipo === 'numeros') {
-        // Bloquea letras, solo permite números, el signo + y guiones
-        this.value = this.value.replace(/[^0-9+\- ]/g, '');
-      }
-    });
+  // VALIDACIÓN ESTRICTA GLOBAL (Letras, Números y Teléfonos sin salto de cursor)
+  document.addEventListener('input', function(e) {
+    const input = e.target;
+    if (!input.dataset.tipo) return;
+
+    let originalValue = input.value;
+    let newValue = originalValue;
+
+    if (input.dataset.tipo === 'letras') {
+      newValue = originalValue.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '');
+    } else if (input.dataset.tipo === 'numeros') {
+      newValue = originalValue.replace(/[^0-9]/g, '');
+    } else if (input.dataset.tipo === 'telefono') {
+      newValue = originalValue.replace(/[^0-9+\s()\-]/g, '');
+    }
+
+    if (originalValue !== newValue) {
+      let start = input.selectionStart;
+      let end = input.selectionEnd;
+      
+      input.value = newValue;
+      
+      try { input.setSelectionRange(start - 1, end - 1); } catch (err) {}
+    }
   });
-  // ==========================================================
 
   const params    = new URLSearchParams(window.location.search);
   const negocioId = params.get('id');
