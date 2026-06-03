@@ -440,12 +440,10 @@ async function guardarServicio() {
 
   document.getElementById('err-serv-nombre').textContent = '';
   
-  // === NUEVAS VALIDACIONES ESTRICTAS PARA SERVICIOS ===
   if (!nombre) { document.getElementById('err-serv-nombre').textContent = 'El nombre es obligatorio.'; return; }
   if (/^\d+$/.test(nombre)) { document.getElementById('err-serv-nombre').textContent = 'El nombre no puede contener solo números.'; return; }
   if (dur < 5) { document.getElementById('err-serv-nombre').textContent = 'La duración debe ser al menos 5 min.'; return; }
   if (precio < 0) { document.getElementById('err-serv-nombre').textContent = 'El precio no puede ser negativo.'; return; }
-  // ====================================================
 
   setBtnState('modal-serv-guardar', true, '');
   try {
